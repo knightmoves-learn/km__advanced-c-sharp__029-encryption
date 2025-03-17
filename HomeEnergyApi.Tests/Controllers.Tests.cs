@@ -63,7 +63,7 @@ public class ControllersTests
     [Fact, TestPriority(3)]
     public async Task HomeEnergyApiCanRegisterANewUser()
     {
-        HttpResponseMessage? newUserResponse = await RegisterUser(_username, _password, "Admin");
+        HttpResponseMessage? newUserResponse = await RegisterUser(_username, _password, "Admin", "123 Test. St");
 
         Assert.True(newUserResponse?.IsSuccessStatusCode,
             $"HomeEnergyApi did not return successful HTTP Response Code on attempting to register new user at /authentication/register; instead received {(int?)newUserResponse?.StatusCode}: {newUserResponse?.StatusCode}");
@@ -72,8 +72,8 @@ public class ControllersTests
     [Fact, TestPriority(4)]
     public async Task HomeEnergyApiDoesNotAllowMultipleUsersWithSameUserName()
     {
-        await RegisterUser(_username, _password, "Admin");
-        HttpResponseMessage? newUserResponse = await RegisterUser(_username, _password, "Admin");
+        await RegisterUser(_username, _password, "Admin", "123 Test. St");
+        HttpResponseMessage? newUserResponse = await RegisterUser(_username, _password, "Admin", "123 Test. St");
         string? newUserResponseStr = await newUserResponse.Content.ReadAsStringAsync() ?? "";
 
         Assert.True(newUserResponseStr == "Username is already taken.",
@@ -83,8 +83,8 @@ public class ControllersTests
     [Fact, TestPriority(5)]
     public async Task HomeEnergyApiCanProvideABearerToken()
     {
-        await RegisterUser(_username, _password, "Admin");
-        string token = await GetBearerToken(_username, _password, "Admin", false);
+        await RegisterUser(_username, _password, "Admin", "123 Test. St");
+        string token = await GetBearerToken(_username, _password, "Admin", "123 Test. St", false);
 
         bool isValidToken = token.Contains("\"token\":\"");
 
@@ -97,8 +97,8 @@ public class ControllersTests
     public async Task HomeEnergyApiCanPOSTAHomeGivenAValidHomeDto(string url)
     {
         var client = _factory.CreateClient();
-        await RegisterUser($"POST{_username}", _password, "Admin");
-        string token = await GetBearerToken($"POST{_username}", _password, "Admin", true);
+        await RegisterUser($"POST{_username}", _password, "Admin", "123 Test. St");
+        string token = await GetBearerToken($"POST{_username}", _password, "Admin", "123 Test. St", true);
         client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
 
         HomeDto postTestHomeDto = BuildTestHomeDto("Test", "123 Test St.", "Test City", 123);
@@ -177,8 +177,8 @@ public class ControllersTests
     public async Task HomeEnergyApiAppliesGlobalExceptionFilter(string url)
     {
         var client = _factory.CreateClient();
-        await RegisterUser($"BANG{_username}", _password, "Admin");
-        string token = await GetBearerToken($"BANG{_username}", _password, "Admin", true);
+        await RegisterUser($"BANG{_username}", _password, "Admin", "123 Test. St");
+        string token = await GetBearerToken($"BANG{_username}", _password, "Admin", "123 Test. St", true);
         client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
 
         var bangResponse = await client.GetAsync(url);
@@ -192,7 +192,7 @@ public class ControllersTests
             $"HomeEnergyApi did not return the expected result on GET request at {url}\nExpected:{expected}\nReceived:{bangResponseStr}");
     }
 
-    public async Task<string> GetBearerToken(string username, string password, string role, bool trimToken)
+    public async Task<string> GetBearerToken(string username, string password, string role, string homeStreetAddress, bool trimToken)
     {
         var client = _factory.CreateClient();
         HttpRequestMessage sendRequest = new HttpRequestMessage(HttpMethod.Post, "/Authentication/token");
@@ -200,6 +200,7 @@ public class ControllersTests
         userDto.Username = username;
         userDto.Password = password;
         userDto.Role = role;
+        userDto.HomeStreetAddress = homeStreetAddress;
         string userDtoStr = JsonSerializer.Serialize(userDto);
 
         sendRequest.Content = new StringContent(userDtoStr,
@@ -215,7 +216,7 @@ public class ControllersTests
             return responseStr;
     }
 
-    public async Task<HttpResponseMessage?> RegisterUser(string username, string password, string role)
+    public async Task<HttpResponseMessage?> RegisterUser(string username, string password, string role, string homeStreetAddress)
     {
         var client = _factory.CreateClient();
         HttpRequestMessage sendRequest = new HttpRequestMessage(HttpMethod.Post, "/Authentication/register");
@@ -223,6 +224,7 @@ public class ControllersTests
         userDto.Username = username;
         userDto.Password = password;
         userDto.Role = role;
+        userDto.HomeStreetAddress = homeStreetAddress;
         string userDtoStr = JsonSerializer.Serialize(userDto);
 
         sendRequest.Content = new StringContent(userDtoStr,

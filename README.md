@@ -6,55 +6,50 @@
 
 ## Instructions
 
-The classes `UserDto`, `User`, `IUserRepository`, and `UserRepository` have been created and can be found in `HomeEnergyApi/Models`
+The file `HomeEnergyApi/secrets.json` has been pre-filled with AES:Key and AES:InitializationVector properties. Do NOT change this file.
+
+Also, the `UserDto` and `User` models have each been given a `HomeStreetAddress` and `EncryptedHomeStreetAddress` property respectively, you will be responsible for adding working encryption on these fields in this lesson.
+
+In `HomeEnergyApi/Security/ValueEncryptor.cs`
+- Create a public class `ValueEncryptor` with the following private static property names / types
+    - key / `string`
+    - iv / `string`
+- Pass an `IConfiguration` object to this class' constructor, and assign the newly created "key" and "iv" properties to the result of reading the "AES:Key" and "AES:InitializationVector" properties from the passed `IConfiguration`
+- Create a public method `Encrypt()` returning a `string`
+    - `Encrypt()` should take one argument of type `string`
+    - `Encrypt()` should return a new `ArgumentException` with the value "Key must be 32 bytes and IV must be 16 bytes long." when the "key" property is not 32 characters in length, or the "iv" is not 16 characters in length
+    - `Encrypt()` should create a new variable representing an AES Algorithm from the result of `Aes.Create()`, using the `using` keyword as to ensure it is properly disposed. Then, set the `Key` and `IV` properties on the newly created variable to the `byte []` value of the class level "key" and "iv" properties
+    - `Encrypt()` should create a new variable from the result of calling `CreateEncryptor` on the newly created AES Algorithm variable, passing it the `Key` and `IV` properties from the newly created AES Algorithm variable
+    - `Encrypt()` should initialize a variable of type `byte []`
+    - `Encrypt()` should create a new variable of type `MemoryStream`, using the `using` keyword as to ensure it is properly disposed.
+    - `Encrypt()` should create a new variable of type `CryptoStream` passing the newly created `MemoryStream`, empty `byte []`, and `CryptoStreamMode.Write` into it's constructor, using the `using` keyword as to ensure it is properly disposed.
+    - `Encrypt()` should create a new variable of type `StreamWriter` passing the newly created `CryptoStream` into it's constructor, using the `using` keyword as to ensure it is properly disposed. Then, use the `Write()` method on the `StreamWriter` passing the method's `string` argument. Then, set the initialized `byte []` to the value of calling `ToArray()` on the newly created `MemortyStream` inside of its `using` block
+    - `Encrypt()` should return the result of calling `Convert.ToBase64String` passing the `byte []` variable
+- Create a public method `Decrypt()` returning a `string`
+    - `Decrypt()` should take one argument of type `string`
+    - `Decrypt()` should return a new `ArgumentException` with the value "Key must be 32 bytes and IV must be 16 bytes long." when the "key" property is not 32 characters in length, or the "iv" is not 16 characters in length
+    - `Decrypt()` should create a new variable representing an AES Algorithm from the result of `Aes.Create()`, using the `using` keyword as to ensure it is properly disposed. Then, set the `Key` and `IV` properties on the newly created variable to the `byte []` value of the class level "key" and "iv" properties
+    - `Decrypt()` should create a new variable from the result of calling `CreateDecryptor` on the newly created AES Algorithm variable, passing it the `Key` and `IV` properties from the newly created AES Algorithm variable
+    - `Decrypt()` should initialize a variable of type `string`
+    - `Decrypt()` should create a new `byte []` from the result of calling `Convert.FromBase64String()` passing the method's `string` argument
+    - `Decrypt()` should create a new variable of type `MemoryStream` passing the newly created `byte []`, using the `using` keyword as to ensure it is properly disposed.
+    - `Decrypt()` should create a new variable of type `CryptoStream` passing the newly created `MemoryStream`, the variable holding the AES Algorithm Decryptor, and `CryptoStreamMode.Read` into it's constructor, using the `using` keyword as to ensure it is properly disposed.
+    - `Decrypt()` should create a new variable of type `StreamWriter` passing the newly created `CryptoStream` into it's constructor, using the `using` keyword as to ensure it is properly disposed. Then, assign the value of calling `ReadToEnd()` method on the `StreamWriter` to the intialized `string`. 
+    - `Decrypt()` should return the `string` that the `StreamReader` set the value on
 
 In `HomeEnergyApi/Controllers/AuthenticationController.cs`
-- Add three private readonly properties on `AuthenticationController` with the following names / types
-    - userRepository / `IUserRepository`
-    - passwordHasher / `ValueHasher`
-    - mapper / `IMapper`
-- Add the newly created properties as arguments to the constructor on `AuthenticationController`
-- Create a new public async method `Register()` returning a `Task<IActionResult>`
-    - `Register()` should have an `HttpPost` attribute with the route `register`
-    - `Register()` should have one argument of type `UserDto` coming from the body of the Http request
-    - `Register()` should create a variable from the result of calling `FindByUsername` on the newly created `IUserRepository` property and passing the `Username` property on the passed `UserDto`
-        - If the newly created variable is null, `Register()` should return `BadRequest("Username is already taken.")`
-    - `Register()` should create a variable calling `.Map<User>()` on the newly created `IMapper` property passing the passed `UserDto`
-        - `Register()` should set the `HashedPassword` property on this newly created variable to the result of calling `HashPassword()` on the newly passed `ValueHasher` property and passing the `Password` property on the passed `UserDto`
-        - `Register()` should call `Save()` on the newly created `IUserRepository` property passing this newly created variable
-    - `Register()` should return `Ok("User registered successfully.")`
-- Refactor `Token()` so that...
-    - The argument being passed is now type `UserDto`
-    - If the result of calling `FindByUsername()` on the newly created `IUserRepository` and passing the `UserDto` argument is null OR the result of calling `VerifyPasssword()` on the newly created `ValueHasher` property and passing the `Username` and `Password` from the passed `UserDto` is false
-        - Return `Unauthorized("Invalid username or password.");`
-    - The result of calling `FindByUsername()` on the newly created `IUserRepository` and passing the `UserDto` argument is passed into `GenerateJwtToken()`
-- Refactor `GenerateJwtToken()` so that...
-    - The argument being passed is now type `User`
-    - In the `claims[]` being created, the hardcoded email is replaced with the `Username` on the passed `User` and the formerly passed `string` role is replaced with the `Role` on the passed `User`
-
-In `HomeEnergyApi/Dtos/HomeProfile.cs`
-- Call `CreateMap()` supplying the types `UserDto` and `User`
-
-In `HomeEnergyApi/Security/ValueHasher`
-- Create a new public class `ValueHasher`
-    - Create a `HashPassword()` method taking one argument of type `string`
-        - Using a variable of type `SHA256`, create a variable from the result of calling `SHA256.ComputeHash` and passing `Encoding.UTF8.GetBytes()` with the `string` argument passed
-        - Return the result of passing this created variable to `Convert.ToBase64String()`
-    - Create a `VerifyPassword()` method taking two arguments of type `string`
-        - Create a variable from the result of calling `HashPassword()` on the second argument
-        - If the created variable and the first argument are the same, return true. Otherwise, return false
-
-In `HomeEnergyApi/Models/HomeDbContext.cs`
-- Add a new public `DbSet<User>` named "Users"
+- Add a private readonly property to `AuthenticationController` of type `ValueEncryptor`, also adding this property to the class' constructor
+- Refactor the `Register()` method to...
+    - Set the `EncryptedHomeStreetAddress` property on the user being registered to the result of passing the `HomeStreetAddress` property to the `Encrypt()` method on the `ValueEncryptor` property
+- You may want to add additional logging similar to what was shown in the lecture to the `Register()` and `Token()` methods to see the encrypted and decrypted street address value as a user is registered and given a token. This will display in this assignment's autograding output. However, this is not necessary to complete the lesson.
 
 In `HomeEnergyApi/Program.cs`
-- Add a scoped service supplying the types `IUserRepository` and `UserRepository`
-- Add a singleton service supplying the type `ValueHasher`
+- Add a singleton service to the builder of type `ValueEncryptor`
 
 In your terminal
 - ONLY IF you are working on codespaces or a different computer/environment as the previous lesson and don't have `dotnet-ef` installed globally, run `dotnet tool install --global dotnet-ef`, otherwise skip this step
     - To check if you have `dotnet-ef` installed, run `dotnet-ef --version`
-- Run `dotnet ef migrations add AddUserAuthenticationAndHashing`
+- Run `dotnet ef migrations add AddUserStreetAddressEncryption`
 - Run `dotnet ef database update`
 
 ## Additional Information

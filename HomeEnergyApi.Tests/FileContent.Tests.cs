@@ -140,4 +140,12 @@ public class FileTests
         Assert.True(containsSingletonValueHasher,
             "HomeEnergyApi/Program.cs does not add a value hasher singleton service");
     }
+
+    [Fact]
+    public void DoesProgramAddSingletonValueEncryptor()
+    {
+        bool containsSingletonValueHasher = programContent.Contains("builder.Services.AddSingleton<ValueEncryptor>();");
+        Assert.True(containsSingletonValueHasher,
+            "HomeEnergyApi/Program.cs does not add a value encryptor singleton service");
+    }
 }

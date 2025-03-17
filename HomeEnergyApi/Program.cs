@@ -1,13 +1,12 @@
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using AutoMapper;
 using HomeEnergyApi.Models;
 using HomeEnergyApi.Services;
 using HomeEnergyApi.Dtos;
 using HomeEnergyApi.Filters;
 using HomeEnergyApi.Authorization;
+using HomeEnergyApi.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +25,7 @@ builder.Services.AddScoped<IWriteRepository<int, HomeUtilityProvider>>(provider 
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<ValueHasher>();
+builder.Services.AddSingleton<ValueEncryptor>();
 
 builder.Services.AddTransient<ZipCodeLocationService>();
 builder.Services.AddHttpClient<ZipCodeLocationService>();

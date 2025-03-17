@@ -1,20 +1,23 @@
 using System.Security.Cryptography;
 using System.Text;
 
-public class ValueHasher
+namespace HomeEnergyApi.Security
 {
-    public string HashPassword(string password)
+    public class ValueHasher
     {
-        using (var sha256 = SHA256.Create())
+        public string HashPassword(string password)
         {
-            var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(hashBytes);
+            using (var sha256 = SHA256.Create())
+            {
+                var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashBytes);
+            }
         }
-    }
 
-    public bool VerifyPassword(string hashedPassword, string password)
-    {
-        var hashedInputPassword = HashPassword(password);
-        return hashedPassword == hashedInputPassword;
+        public bool VerifyPassword(string hashedPassword, string password)
+        {
+            var hashedInputPassword = HashPassword(password);
+            return hashedPassword == hashedInputPassword;
+        }
     }
 }

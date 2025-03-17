@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using HomeEnergyApi.Dtos;
 using HomeEnergyApi.Models;
+using HomeEnergyApi.Security;
 
 
 namespace HomeEnergyApi.Controllers
@@ -19,11 +20,13 @@ namespace HomeEnergyApi.Controllers
         private readonly string _secret;
         private readonly IUserRepository userRepository;
         private readonly ValueHasher passwordHasher;
+        private readonly ValueEncryptor valueEncryptor;
         private readonly IMapper mapper;
 
         public AuthenticationController(IConfiguration configuration,
                                         IUserRepository userRepository,
                                         ValueHasher passwordHasher,
+                                        ValueEncryptor valueEncryptor,
                                         IMapper mapper)
         {
             _issuer = configuration["Jwt:Issuer"];
@@ -31,6 +34,7 @@ namespace HomeEnergyApi.Controllers
             _secret = configuration["Jwt:Secret"];
             this.userRepository = userRepository;
             this.passwordHasher = passwordHasher;
+            this.valueEncryptor = valueEncryptor;
             this.mapper = mapper;
         }
 
@@ -44,7 +48,17 @@ namespace HomeEnergyApi.Controllers
             }
 
             var user = mapper.Map<User>(userDto);
-            user.HashedPassword = passwordHasher.HashPassword(userDto.Password);
+
+            // user.HashedPassword = passwordHasher.HashPassword(userDto.Password);
+
+            string hashPassword = passwordHasher.HashPassword(userDto.Password);
+            Console.WriteLine("Hashed Password: " + hashPassword);
+            user.HashedPassword = hashPassword;
+
+            string encryptedStreetAddress = valueEncryptor.Encrypt(userDto.HomeStreetAddress);
+            Console.WriteLine("Encrypted Street Address: " + encryptedStreetAddress);
+            user.EncryptedHomeStreetAddress = encryptedStreetAddress;
+
 
             userRepository.Save(user);
             return Ok("User registered successfully.");
@@ -58,6 +72,9 @@ namespace HomeEnergyApi.Controllers
             {
                 return Unauthorized("Invalid username or password.");
             }
+
+            string streetAddress = valueEncryptor.Decrypt(user.EncryptedHomeStreetAddress);
+            Console.WriteLine("Decrypted Street Address: " + streetAddress);
 
             string token = GenerateJwtToken(user);
             return Ok(new { token });
