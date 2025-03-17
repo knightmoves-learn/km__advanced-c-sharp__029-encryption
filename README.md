@@ -67,6 +67,7 @@ In your terminal
 - Explain security issues that might lead to compromised computer programs (3B-AP-18) https://www.csteachers.org/page/standards
 
 ## Resources
-- https://en.wikipedia.org/wiki/Cryptographic_hash_function
+- https://en.wikipedia.org/wiki/Encryption
+- https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
 
 Copyright &copy; 2025 Knight Moves. All Rights Reserved.
