@@ -21,11 +21,14 @@ namespace HomeEnergyApi.Controllers
         private readonly IUserRepository userRepository;
         private readonly ValueHasher passwordHasher;
         private readonly IMapper mapper;
+        private readonly ValueEncryptor encryptor;
 
-        public AuthenticationController(IConfiguration configuration,
-                                        IUserRepository userRepository,
-                                        ValueHasher passwordHasher,
-                                        IMapper mapper)
+        public AuthenticationController(
+            IConfiguration configuration,
+            IUserRepository userRepository,
+            ValueHasher passwordHasher,
+            IMapper mapper,
+            ValueEncryptor encryptor)
         {
             _issuer = configuration["Jwt:Issuer"];
             _audience = configuration["Jwt:Audience"];
@@ -33,6 +36,7 @@ namespace HomeEnergyApi.Controllers
             this.userRepository = userRepository;
             this.passwordHasher = passwordHasher;
             this.mapper = mapper;
+            this.encryptor = encryptor;
         }
 
         [HttpPost("register")]
@@ -47,6 +51,8 @@ namespace HomeEnergyApi.Controllers
             var user = mapper.Map<User>(userDto);
 
             user.HashedPassword = passwordHasher.HashPassword(userDto.Password);
+
+            user.EncryptedHomeStreetAddress = encryptor.Encrypt(userDto.HomeStreetAddress);
 
             userRepository.Save(user);
             return Ok("User registered successfully.");
