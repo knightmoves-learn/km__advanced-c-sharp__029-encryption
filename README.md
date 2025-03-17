@@ -1,8 +1,9 @@
-# 025 Role Based Authentication
+# 029 Encryption
 
 ## Lecture
 
-[![# Role Based Authentication](https://img.youtube.com/vi/RTUTtORZ8nM/0.jpg)](https://www.youtube.com/watch?v=RTUTtORZ8nM)
+[![# Encryption (Part 1)](https://img.youtube.com/vi/KSoNy85tLOM/0.jpg)](https://www.youtube.com/watch?v=KSoNy85tLOM)
+[![# Encryption (Part 2)](https://img.youtube.com/vi/nLe8iiv6Ry8/0.jpg)](https://www.youtube.com/watch?v=nLe8iiv6Ry8)
 
 ## Instructions
 

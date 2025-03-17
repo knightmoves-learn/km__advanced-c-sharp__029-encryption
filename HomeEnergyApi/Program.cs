@@ -25,7 +25,6 @@ builder.Services.AddScoped<IWriteRepository<int, HomeUtilityProvider>>(provider 
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<ValueHasher>();
-builder.Services.AddSingleton<ValueEncryptor>();
 
 builder.Services.AddTransient<ZipCodeLocationService>();
 builder.Services.AddHttpClient<ZipCodeLocationService>();
