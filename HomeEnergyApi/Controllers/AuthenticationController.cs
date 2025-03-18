@@ -52,7 +52,9 @@ namespace HomeEnergyApi.Controllers
 
             user.HashedPassword = passwordHasher.HashPassword(userDto.Password);
 
-            user.EncryptedHomeStreetAddress = encryptor.Encrypt(userDto.HomeStreetAddress);
+            string encryptedHomeStreetAddress = encryptor.Encrypt(userDto.HomeStreetAddress);
+            Console.WriteLine("Encrypted Home Street Address " + encryptedHomeStreetAddress);
+            user.EncryptedHomeStreetAddress = encryptedHomeStreetAddress;
 
             userRepository.Save(user);
             return Ok("User registered successfully.");
@@ -66,6 +68,9 @@ namespace HomeEnergyApi.Controllers
             {
                 return Unauthorized("Invalid username or password.");
             }
+
+            string decryptedHomeStreetAddress = encryptor.Decrypt(user.EncryptedHomeStreetAddress);
+            Console.WriteLine("Decrypted Home Street Address: " + decryptedHomeStreetAddress);
 
             string token = GenerateJwtToken(user);
             return Ok(new { token });
