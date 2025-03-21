@@ -70,4 +70,4 @@ In your terminal
 - https://en.wikipedia.org/wiki/Encryption
 - https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
 
-Copyright &copy; 2025 Knight Moves. All Rights Reserved.
+Copyright &copy; 2025 Knight Moves. All Rights Reserved. 
