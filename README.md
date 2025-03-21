@@ -47,12 +47,6 @@ In `HomeEnergyApi/Controllers/AuthenticationController.cs`
 In `HomeEnergyApi/Program.cs`
 - Add a singleton service to the builder of type `ValueEncryptor`
 
-In your terminal
-- ONLY IF you are working on codespaces or a different computer/environment as the previous lesson and don't have `dotnet-ef` installed globally, run `dotnet tool install --global dotnet-ef`, otherwise skip this step
-    - To check if you have `dotnet-ef` installed, run `dotnet-ef --version`
-- Run `dotnet ef migrations add AddUserStreetAddressEncryption`
-- Run `dotnet ef database update`
-
 ## Additional Information
 - Do not remove or modify anything in `HomeEnergyApi.Tests`
 - Some Models may have changed for this lesson from the last, as always all code in the lesson repository is available to view
