@@ -27,7 +27,6 @@ x86/
 build/
 bld/
 [Bb]in/
-!km__advanced-c-sharp__029-encryption\HomeEnergyApi.Tests\bin\Debug\net8.0\Homes.db
 [Oo]bj/
 [Oo]ut/
 msbuild.log
