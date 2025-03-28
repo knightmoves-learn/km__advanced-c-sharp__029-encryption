@@ -45,7 +45,7 @@ In `HomeEnergyApi/Controllers/AuthenticationController.cs`
 - You may want to add additional logging similar to what was shown in the lecture to the `Register()` and `Token()` methods to see the encrypted and decrypted street address value as a user is registered and given a token. This will display in this assignment's autograding output. However, this is not necessary to complete the lesson.
 
 In `HomeEnergyApi/Program.cs`
-- Add a singleton service to the builder of type `ValueEncryptor`
+- Add a singleton service to the builder of type `ValueEncryptor` 
 
 ## Additional Information
 - Do not remove or modify anything in `HomeEnergyApi.Tests`
