@@ -31,9 +31,12 @@ builder.Services.AddHttpClient<ZipCodeLocationService>();
 
 builder.Services.AddTransient<HomeUtilityProviderService>();
 
+builder.Services.AddSingleton<ValueEncryptor>();
+
 builder.Services.AddDbContext<HomeDbContext>(options =>
     options.UseSqlite("Data Source=Homes.db").ConfigureWarnings(warings =>
     warings.Ignore(RelationalEventId.NonTransactionalMigrationOperationWarning)));
+
 
 builder.Services.AddControllers(options =>
 {
