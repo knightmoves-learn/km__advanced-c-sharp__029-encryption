@@ -27,6 +27,7 @@ x86/
 build/
 bld/
 [Bb]in/
+!/HomeEnergyApi.Tests/bin/Debug/net8.0/Homes.db
 [Oo]bj/
 [Oo]ut/
 msbuild.log
