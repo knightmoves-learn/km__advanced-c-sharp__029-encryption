@@ -21,14 +21,11 @@ namespace HomeEnergyApi.Controllers
         private readonly IUserRepository userRepository;
         private readonly ValueHasher passwordHasher;
         private readonly IMapper mapper;
-        private readonly ValueEncryptor encryptor;
 
-        public AuthenticationController(
-            IConfiguration configuration,
-            IUserRepository userRepository,
-            ValueHasher passwordHasher,
-            IMapper mapper,
-            ValueEncryptor encryptor)
+        public AuthenticationController(IConfiguration configuration,
+                                        IUserRepository userRepository,
+                                        ValueHasher passwordHasher,
+                                        IMapper mapper)
         {
             _issuer = configuration["Jwt:Issuer"];
             _audience = configuration["Jwt:Audience"];
@@ -36,7 +33,6 @@ namespace HomeEnergyApi.Controllers
             this.userRepository = userRepository;
             this.passwordHasher = passwordHasher;
             this.mapper = mapper;
-            this.encryptor = encryptor;
         }
 
         [HttpPost("register")]
@@ -52,10 +48,6 @@ namespace HomeEnergyApi.Controllers
 
             user.HashedPassword = passwordHasher.HashPassword(userDto.Password);
 
-            string encryptedHomeStreetAddress = encryptor.Encrypt(userDto.HomeStreetAddress);
-            Console.WriteLine("Encrypted Home Street Address " + encryptedHomeStreetAddress);
-            user.EncryptedHomeStreetAddress = encryptedHomeStreetAddress;
-
             userRepository.Save(user);
             return Ok("User registered successfully.");
         }
@@ -68,9 +60,6 @@ namespace HomeEnergyApi.Controllers
             {
                 return Unauthorized("Invalid username or password.");
             }
-
-            string decryptedHomeStreetAddress = encryptor.Decrypt(user.EncryptedHomeStreetAddress);
-            Console.WriteLine("Decrypted Home Street Address: " + decryptedHomeStreetAddress);
 
             string token = GenerateJwtToken(user);
             return Ok(new { token });
